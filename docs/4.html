@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Knowledge - Makefile Learning</title>
+        <title>条件 - Makefile Learning</title>
 
 
         <!-- Custom HTML head -->
@@ -90,7 +90,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">ABOUT Assembly</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../docs/index.html" class="active"><strong aria-hidden="true">1.</strong> Knowledge</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../docs/1.html"><strong aria-hidden="true">1.1.</strong> 基本内容</a></li><li class="chapter-item expanded "><a href="../docs/2.html"><strong aria-hidden="true">1.2.</strong> 书写规则</a></li><li class="chapter-item expanded "><a href="../docs/3.html"><strong aria-hidden="true">1.3.</strong> 命令</a></li><li class="chapter-item expanded "><a href="../docs/4.html"><strong aria-hidden="true">1.4.</strong> 条件</a></li><li class="chapter-item expanded "><a href="../docs/5.html"><strong aria-hidden="true">1.5.</strong> 其他</a></li></ol></li><li class="chapter-item expanded "><a href="../labs/index.html"><strong aria-hidden="true">2.</strong> Labs</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../labs/NKU-compiler.html"><strong aria-hidden="true">2.1.</strong> 简单makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore.html"><strong aria-hidden="true">2.2.</strong> 中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore-rv.html"><strong aria-hidden="true">2.3.</strong> 另一个中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/optee.html"><strong aria-hidden="true">2.4.</strong> 复杂makefile分析</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">ABOUT Assembly</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../docs/index.html"><strong aria-hidden="true">1.</strong> Knowledge</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../docs/1.html"><strong aria-hidden="true">1.1.</strong> 基本内容</a></li><li class="chapter-item expanded "><a href="../docs/2.html"><strong aria-hidden="true">1.2.</strong> 书写规则</a></li><li class="chapter-item expanded "><a href="../docs/3.html"><strong aria-hidden="true">1.3.</strong> 命令</a></li><li class="chapter-item expanded "><a href="../docs/4.html" class="active"><strong aria-hidden="true">1.4.</strong> 条件</a></li><li class="chapter-item expanded "><a href="../docs/5.html"><strong aria-hidden="true">1.5.</strong> 其他</a></li></ol></li><li class="chapter-item expanded "><a href="../labs/index.html"><strong aria-hidden="true">2.</strong> Labs</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../labs/NKU-compiler.html"><strong aria-hidden="true">2.1.</strong> 简单makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore.html"><strong aria-hidden="true">2.2.</strong> 中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore-rv.html"><strong aria-hidden="true">2.3.</strong> 另一个中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/optee.html"><strong aria-hidden="true">2.4.</strong> 复杂makefile分析</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -178,18 +178,112 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="笔记"><a class="header" href="#笔记">笔记</a></h1>
-<p>详细记录我认为有价值和重要的知识点</p>
+                        <h1 id="条件判断"><a class="header" href="#条件判断">条件判断</a></h1>
+<p>使用条件判断，可以让make根据运行时的不同情况选择不同的执行分支。条件表达式可以是比较变量的值，或是比较变量和常量的值。</p>
+<p>下面的例子，判断 $(CC) 变量是否 gcc ，如果是的话，则使用GNU函数编译目标。</p>
+<pre><code>libs_for_gcc = -lgnu
+normal_libs =
+
+foo: $(objects)
+ifeq ($(CC),gcc)
+    $(CC) -o foo $(objects) $(libs_for_gcc)
+else
+    $(CC) -o foo $(objects) $(normal_libs)
+endif
+</code></pre>
+<p>可见，在上面示例的这个规则中，目标 foo 可以根据变量 $(CC) 值来选取不同的函数库来编译程序。</p>
+<p>我们可以从上面的示例中看到三个关键字： ifeq 、 else 和 endif 。 ifeq 的意思表示条件语句的开始，并指定一个条件表达式，表达式包含两个参数，以逗号分隔，表达式以圆括号括起。 else 表示条件表达式为假的情况。 endif 表示一个条件语句的结束，任何一个条件表达式都应该以 endif 结束。</p>
+<h2 id="语法"><a class="header" href="#语法">语法</a></h2>
+<p>条件表达式的语法为:</p>
+<pre><code>&lt;conditional-directive&gt;
+&lt;text-if-true&gt;
+endif
+</code></pre>
+<p>以及:</p>
+<pre><code>&lt;conditional-directive&gt;
+&lt;text-if-true&gt;
+else
+&lt;text-if-false&gt;
+endif
+</code></pre>
+<p>其中 <conditional-directive> 表示条件关键字，如 ifeq 。这个关键字有四个。</p>
+<p>第一个是我们前面所见过的 ifeq</p>
+<pre><code>ifeq (&lt;arg1&gt;, &lt;arg2&gt;)
+ifeq '&lt;arg1&gt;' '&lt;arg2&gt;'
+ifeq &quot;&lt;arg1&gt;&quot; &quot;&lt;arg2&gt;&quot;
+ifeq &quot;&lt;arg1&gt;&quot; '&lt;arg2&gt;'
+ifeq '&lt;arg1&gt;' &quot;&lt;arg2&gt;&quot;
+</code></pre>
+<p>比较参数 arg1 和 arg2 的值是否相同。当然，参数中我们还可以使用make的函数。如:</p>
+<pre><code>ifeq ($(strip $(foo)),)
+&lt;text-if-empty&gt;
+endif
+</code></pre>
+<p>这个示例中使用了 strip 函数，如果这个函数的返回值是空（Empty），那么 <text-if-empty> 就生效。</p>
+<p>第二个条件关键字是 ifneq 。语法是：</p>
+<pre><code>ifneq (&lt;arg1&gt;, &lt;arg2&gt;)
+ifneq '&lt;arg1&gt;' '&lt;arg2&gt;'
+ifneq &quot;&lt;arg1&gt;&quot; &quot;&lt;arg2&gt;&quot;
+ifneq &quot;&lt;arg1&gt;&quot; '&lt;arg2&gt;'
+ifneq '&lt;arg1&gt;' &quot;&lt;arg2&gt;&quot;
+</code></pre>
+<p>其比较参数 arg1 和 arg2 的值是否相同，如果不同，则为真。和 ifeq 类似。</p>
+<p>第三个条件关键字是 ifdef 。语法是：</p>
+<p><code>ifdef &lt;variable-name&gt;</code>
+如果变量 <variable-name> 的值非空，那到表达式为真。否则，表达式为假。当然， <variable-name> 同样可以是一个函数的返回值。注意， ifdef 只是测试一个变量是否有值，其并不会把变量扩展到当前位置。</p>
+<h1 id="函数"><a class="header" href="#函数">函数</a></h1>
+<p>在Makefile中可以使用函数来处理变量，从而让我们的命令或是规则更为的灵活和具有智能。make 所支持的函数也不算很多，不过已经足够我们的操作了。函数调用后，函数的返回值可以当做变量来使用。</p>
+<p>函数的调用语法¶
+函数调用，很像变量的使用，也是以 $ 来标识的，其语法如下：</p>
+<p><code>$(&lt;function&gt; &lt;arguments&gt;)</code>
+或是:</p>
+<p><code>${&lt;function&gt; &lt;arguments&gt;}</code>
+这里， <function> 就是函数名，make支持的函数不多。 <arguments> 为函数的参数，参数间以逗号 , 分隔，而函数名和参数之间以“空格”分隔。函数调用以<code>$</code>开头，以圆括号或花括号把函数名和参数括起。感觉很像一个变量，是不是？函数中的参数可以使用变量，为了风格的统一，函数和变量的括号最好一样，如使用<code>$(subst a,b,$(x))</code>这样的形式，而不是<code>$(subst a,b, ${x})</code>的形式。因为统一会更清楚，也会减少一些不必要的麻烦。</p>
+<h2 id="字符串处理函数"><a class="header" href="#字符串处理函数">字符串处理函数</a></h2>
+<ul>
+<li>subst</li>
+<li>patsubst</li>
+<li>strip</li>
+<li>findstring</li>
+<li>filter</li>
+<li>filter-out</li>
+<li>sort</li>
+<li>word</li>
+<li>wordlist</li>
+<li>words</li>
+<li>firstword</li>
+</ul>
+<h2 id="文件名操作函数"><a class="header" href="#文件名操作函数">文件名操作函数</a></h2>
+<ul>
+<li>dir</li>
+<li>notdir</li>
+<li>suffix</li>
+<li>basename</li>
+<li>addsuffix</li>
+<li>addprefix</li>
+<li>join</li>
+<li>foreach</li>
+</ul>
+<h2 id="if"><a class="header" href="#if">if</a></h2>
+<p>很像ifeq</p>
+<h2 id="call"><a class="header" href="#call">call</a></h2>
+<p>类似自己定义函数</p>
+<h2 id="origin"><a class="header" href="#origin">origin</a></h2>
+<p>返回变量是从哪来的</p>
+<h2 id="shell"><a class="header" href="#shell">shell</a></h2>
+<p>执行shell命令</p>
+<h2 id="控制make的函数"><a class="header" href="#控制make的函数">控制make的函数</a></h2>
+<p>error,warning</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/3.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/1.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/5.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -199,11 +293,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/3.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/1.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/5.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

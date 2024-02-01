@@ -1,0 +1,325 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>基本内容 - Makefile Learning</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="学习写Makefile">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">ABOUT Assembly</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../docs/index.html"><strong aria-hidden="true">1.</strong> Knowledge</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../docs/1.html" class="active"><strong aria-hidden="true">1.1.</strong> 基本内容</a></li><li class="chapter-item expanded "><a href="../docs/2.html"><strong aria-hidden="true">1.2.</strong> 书写规则</a></li><li class="chapter-item expanded "><a href="../docs/3.html"><strong aria-hidden="true">1.3.</strong> 命令</a></li><li class="chapter-item expanded "><a href="../docs/4.html"><strong aria-hidden="true">1.4.</strong> 条件</a></li><li class="chapter-item expanded "><a href="../docs/5.html"><strong aria-hidden="true">1.5.</strong> 其他</a></li></ol></li><li class="chapter-item expanded "><a href="../labs/index.html"><strong aria-hidden="true">2.</strong> Labs</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../labs/NKU-compiler.html"><strong aria-hidden="true">2.1.</strong> 简单makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore.html"><strong aria-hidden="true">2.2.</strong> 中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/ucore-rv.html"><strong aria-hidden="true">2.3.</strong> 另一个中等makefile分析</a></li><li class="chapter-item expanded "><a href="../labs/optee.html"><strong aria-hidden="true">2.4.</strong> 复杂makefile分析</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Makefile Learning</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/TephrocactusMYC/Makefile-Learning" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="概述"><a class="header" href="#概述">概述</a></h1>
+<p>makefile关系到了整个工程的编译规则。
+&gt;一个工程中的源文件不计其数，并且按类型、功能、模块分别放在若干个目录中，makefile定义了一系列的规则来指定，哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，因为makefile就像一个Shell脚本一样，其中也可以执行操作系统的命令。</p>
+<p>make命令执行时，需要一个makefile文件，以告诉make命令需要怎么样的去编译和链接程序。</p>
+<h2 id="关于程序的编译和链接"><a class="header" href="#关于程序的编译和链接">关于程序的编译和链接</a></h2>
+<blockquote>
+<p>一般来说，无论是C还是C++，首先要把源文件编译成中间代码文件，在Windows下也就是 .obj 文件，UNIX下是 .o 文件，即Object File，这个动作叫做编译（compile）。然后再把大量的Object File合成可执行文件，这个动作叫作链接（link）。</p>
+</blockquote>
+<blockquote>
+<p>编译时，编译器需要的是语法的正确，函数与变量的声明的正确。对于后者，通常是你需要告诉编译器头文件的所在位置（头文件中应该只是声明，而定义应该放在C/C++文件中），只要所有的语法正确，编译器就可以编译出中间目标文件。一般来说，每个源文件都应该对应于一个中间目标文件（ .o 文件或 .obj 文件）。</p>
+</blockquote>
+<blockquote>
+<p>链接时，主要是链接函数和全局变量。所以，我们可以使用这些中间目标文件（ .o 文件或 .obj 文件）来链接我们的应用程序。链接器并不管函数所在的源文件，只管函数的中间目标文件（Object File），在大多数时候，由于源文件太多，编译生成的中间目标文件太多，而在链接时需要明显地指出中间目标文件名，这对于编译很不方便。所以，我们要给中间目标文件打个包，在Windows下这种包叫“库文件”（Library File），也就是 .lib 文件，在UNIX下，是Archive File，也就是 .a 文件。</p>
+</blockquote>
+<h2 id="makefile-基础"><a class="header" href="#makefile-基础">makefile 基础</a></h2>
+<h3 id="从例子开始"><a class="header" href="#从例子开始">从例子开始</a></h3>
+<p>我们的规则是：</p>
+<ul>
+<li>如果这个工程没有编译过，那么我们的所有c文件都要编译并被链接。</li>
+<li>如果这个工程的某几个c文件被修改，那么我们只编译被修改的c文件，并链接目标程序。</li>
+<li>如果这个工程的头文件被改变了，那么我们需要编译引用了这几个头文件的c文件，并链接目标程序。</li>
+</ul>
+<h3 id="makefile的规则"><a class="header" href="#makefile的规则">makefile的规则</a></h3>
+<pre><code>target ... : prerequisites ...
+    recipe
+    ...
+    ...
+</code></pre>
+<h4 id="target"><a class="header" href="#target">target</a></h4>
+<p>可以是一个object file（目标文件），也可以是一个可执行文件，还可以是一个标签（label）。对于标签这种特性，在后续的“伪目标”章节中会有叙述。</p>
+<h4 id="prerequisites"><a class="header" href="#prerequisites">prerequisites</a></h4>
+<p>生成该target所依赖的文件和/或target。</p>
+<h4 id="recipe"><a class="header" href="#recipe">recipe</a></h4>
+<p>该target要执行的命令（任意的shell命令）。</p>
+<p>这是一个文件的依赖关系，也就是说，target这一个或多个的目标文件依赖于prerequisites中的文件，其生成规则定义在command中。说白一点就是说:</p>
+<p><strong>prerequisites中如果有一个以上的文件比target文件要新的话，recipe所定义的命令就会被执行。</strong>
+这就是makefile的规则，也就是makefile中最核心的内容。</p>
+<p>make并不管命令是怎么工作的，他只管执行所定义的命令。make会比较targets文件和prerequisites文件的修改日期，如果prerequisites文件的日期要比targets文件的日期要新，或者target不存在的话，那么，make就会执行后续定义的命令。</p>
+<h3 id="make是如何工作的"><a class="header" href="#make是如何工作的">make是如何工作的</a></h3>
+<p>在默认的方式下，也就是我们只输入 make 命令。那么，</p>
+<ol>
+<li>make会在当前目录下找名字叫“Makefile”或“makefile”的文件。</li>
+<li>如果找到，它会找文件中的第一个目标文件（target），在上面的例子中，他会找到“edit”这个文件，并把这个文件作为最终的目标文件。</li>
+<li>如果edit文件不存在，或是edit所依赖的后面的 .o 文件的文件修改时间要比 edit 这个文件新，那么，他就会执行后面所定义的命令来生成 edit 这个文件。</li>
+<li>如果 edit 所依赖的 .o 文件也不存在，那么make会在当前文件中找目标为 .o 文件的依赖性，如果找到则再根据那一个规则生成 .o 文件。（这有点像一个堆栈的过程）</li>
+<li>当然，你的C文件和头文件是存在的啦，于是make会生成 .o 文件，然后再用 .o 文件生成make的终极任务，也就是可执行文件 edit 了。</li>
+</ol>
+<h3 id="makefile中使用变量"><a class="header" href="#makefile中使用变量">makefile中使用变量</a></h3>
+<p>在一开始生命，然后使用</p>
+<pre><code>$(变量名)
+</code></pre>
+<p>即可方便维护</p>
+<h3 id="让make自动推导"><a class="header" href="#让make自动推导">让make自动推导</a></h3>
+<p>GNU的make很强大，它可以自动推导文件以及文件依赖关系后面的命令，于是我们就没必要去在每一个 .o 文件后都写上类似的命令，因为，我们的make会自动识别，并自己推导命令。</p>
+<p>只要make看到一个 .o 文件，它就会自动的把 .c 文件加在依赖关系中，如果make找到一个 whatever.o ，那么 whatever.c 就会是 whatever.o 的依赖文件。并且 cc -c whatever.c 也会被推导出来</p>
+<p><strong>还可以更加简洁，根据依赖来合并，但是不易维护了</strong></p>
+<h3 id="清空目录的规则"><a class="header" href="#清空目录的规则">清空目录的规则</a></h3>
+<p>每个Makefile中都应该写一个清空目标文件（ .o ）和可执行文件的规则，这不仅便于重编译，也很利于保持文件的清洁。</p>
+<p>.PHONY 表示 clean 是一个“伪目标”</p>
+<p>而在 rm 命令前面加了一个小减号的意思就是，也许某些文件出现问题，但不要管，继续做后面的事。当然， clean 的规则不要放在文件的开头，不然，这就会变成make的默认目标，相信谁也不愿意这样。不成文的规矩是——“clean从来都是放在文件的最后”。</p>
+<h3 id="makefile里有什么"><a class="header" href="#makefile里有什么">Makefile里有什么？</a></h3>
+<p>Makefile里主要包含了五个东西：显式规则、隐式规则、变量定义、指令和注释。</p>
+<ol>
+<li>显式规则。显式规则说明了如何生成一个或多个目标文件。这是由Makefile的书写者明显指出要生成的文件、文件的依赖文件和生成的命令。</li>
+<li>隐式规则。由于我们的make有自动推导的功能，所以隐式规则可以让我们比较简略地书写Makefile，这是由make所支持的。</li>
+<li>变量的定义。在Makefile中我们要定义一系列的变量，变量一般都是字符串，这个有点像你C语言中的宏，当Makefile被执行时，其中的变量都会被扩展到相应的引用位置上。</li>
+<li>指令。其包括了三个部分，一个是在一个Makefile中引用另一个Makefile，就像C语言中的include一样；另一个是指根据某些情况指定Makefile中的有效部分，就像C语言中的预编译#if一样；还有就是定义一个多行的命令。有关这一部分的内容，我会在后续的部分中讲述。</li>
+<li>注释。Makefile中只有行注释，和UNIX的Shell脚本一样，其注释是用 # 字符，这个就像C/C++中的 // 一样。如果你要在你的Makefile中使用 # 字符，可以用反斜杠进行转义，如： # 。</li>
+</ol>
+<p>最后，还值得一提的是，在Makefile中的命令，必须要以 Tab 键开始。</p>
+<h3 id="makefile的文件名"><a class="header" href="#makefile的文件名">Makefile的文件名</a></h3>
+<p>默认的情况下，make命令会在当前目录下按顺序寻找文件名为 GNUmakefile 、 makefile 和 Makefile 的文件。在这三个文件名中，最好使用 <code>Makefile</code> 这个文件名，因为这个文件名在排序上靠近其它比较重要的文件，比如 README。最好不要用 GNUmakefile，因为这个文件名只能由GNU make ，其它版本的 make 无法识别，但是基本上来说，大多数的 make 都支持 makefile 和 Makefile 这两种默认文件名。</p>
+<p>当然，你可以使用别的文件名来书写Makefile，比如：“Make.Solaris”，“Make.Linux”等，如果要指定特定的Makefile，你可以使用make的 -f 或 –file 参数，如： make -f Make.Solaris 或 make –file Make.Linux 。如果你使用多条 -f 或 –file 参数，你可以指定多个makefile。</p>
+<h3 id="包含其它makefile"><a class="header" href="#包含其它makefile">包含其它Makefile</a></h3>
+<p>在Makefile使用 include 指令可以把别的Makefile包含进来，这很像C语言的 #include ，被包含的文件会原模原样的放在当前文件的包含位置。 include 的语法是：</p>
+<pre><code>include &lt;filenames&gt;...
+</code></pre>
+<p><code>&lt;filenames&gt;</code> 可以是当前操作系统Shell的文件模式（可以包含路径和通配符）。</p>
+<p>make命令开始时，会找寻 include 所指出的其它Makefile，并把其内容安置在当前的位置。就好像C/C++的 #include 指令一样。如果文件都没有指定绝对路径或是相对路径的话，make会在当前目录下首先寻找，如果当前目录下没有找到，那么，make还会在下面的几个目录下找：</p>
+<p>如果make执行时，有 -I 或 –include-dir 参数，那么make就会在这个参数所指定的目录下去寻找。</p>
+<p>接下来按顺序寻找目录 <prefix>/include （一般是 /usr/local/bin ）、 /usr/gnu/include 、 /usr/local/include 、 /usr/include 。</p>
+<p><strong>环境变量 .INCLUDE_DIRS 包含当前 make 会寻找的目录列表。你应当避免使用命令行参数 -I 来寻找以上这些默认目录，否则会使得 make “忘掉”所有已经设定的包含目录，包括默认目录。</strong></p>
+<h3 id="make的工作方式"><a class="header" href="#make的工作方式">make的工作方式</a></h3>
+<p>GNU的make工作时的执行步骤如下：（想来其它的make也是类似）</p>
+<ol>
+<li>读入所有的Makefile。</li>
+<li>读入被include的其它Makefile。</li>
+<li>初始化文件中的变量。</li>
+<li>推导隐式规则，并分析所有规则。</li>
+<li>为所有的目标文件创建依赖关系链。</li>
+<li>根据依赖关系，决定哪些目标要重新生成。</li>
+<li>执行生成命令。</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../docs/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../docs/2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../docs/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../docs/2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
